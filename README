@@ -1,3 +1,8 @@
+rakarrack with lcd panels and footswitch control for raspberry pi.
+
+At the moment this is just a copy of original rakarrack
+
+ORIGINAL README:
 This app was born after an informal conversation about effects for guitar using GNU/linux.
 The major part of this apps are discontinued or simply not have new versions after few
 years. Josep Andreu say on the IRC chat "I can made an app based on the effects set 
