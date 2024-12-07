@@ -1,18 +1,14 @@
-Rakarrack is written and mantained by:
-
+Rakarrack is written by:
 	Josep Andreu          holborn@telefonica.net
         Ryan Billing          ryjobil@gmail.com
         Douglas McClendon     dmc@filteredperception.org
 	Arnout Engelen	      arnouten@bzzt.net
-
-
 
 Also other people who collaborate:
 
         Daniel Vidal          hdanielvidalchornet@gmail.com
         José Luis Di Biase    josx@interorganic.com.ar
 	Hernán Ordiales       h@ordia.com.ar
-
 
 Presets by:
 
@@ -33,7 +29,6 @@ Presets by:
 Icons and Logo:
 	
 	Timothy Anderson
-        		
 
 Background Pictures by:
 	
@@ -45,8 +40,6 @@ IR Files:
 	Open Impulse Response Library
 	Gregor Hennig ( Le châtelet )
 
-
-
 Parts of code of this app are taken and/or adapted from
 
 	ZynAddSubFX	Paul Nasca Octavian
@@ -54,5 +47,9 @@ Parts of code of this app are taken and/or adapted from
 	ArtsCompressor	Mathias Kretz & Stefan Westerfeld
         swh-plugins     Steve Harris
         dspdimension	Stephan M. Bernsee
+
+raspberry LCD version adaptation:
+
+	robeweb
 
 Thanks very much to these programmers
