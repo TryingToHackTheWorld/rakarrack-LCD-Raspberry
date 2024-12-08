@@ -24544,42 +24544,52 @@ void RKRGUI::reordena() {
 		{
 		case 0:
 			L1->copy_label(rkr->efx_names[Busca_Eff(rkr->efx_order[i])].Nom);
+			M_IO_CONTROL->setPedalName(0,rkr->efx_names[Busca_Eff(rkr->efx_order[i])].Nom);
 			if ((rkr->deachide) && (!rkr->active[i])) L1->hide(); else L1->show();
 			break;
 		case 1:
 			L2->copy_label(rkr->efx_names[Busca_Eff(rkr->efx_order[i])].Nom);
+			M_IO_CONTROL->setPedalName(1,rkr->efx_names[Busca_Eff(rkr->efx_order[i])].Nom);
 			if ((rkr->deachide) && (!rkr->active[i])) L2->hide(); else L2->show();
 			break;
 		case 2:
 			L3->copy_label(rkr->efx_names[Busca_Eff(rkr->efx_order[i])].Nom);
+			M_IO_CONTROL->setPedalName(2,rkr->efx_names[Busca_Eff(rkr->efx_order[i])].Nom);
 			if ((rkr->deachide) && (!rkr->active[i])) L3->hide(); else L3->show();
 			break;
 		case 3:
 			L4->copy_label(rkr->efx_names[Busca_Eff(rkr->efx_order[i])].Nom);
+			M_IO_CONTROL->setPedalName(3,rkr->efx_names[Busca_Eff(rkr->efx_order[i])].Nom);
 			if ((rkr->deachide) && (!rkr->active[i])) L4->hide(); else L4->show();
 			break;
 		case 4:
 			L5->copy_label(rkr->efx_names[Busca_Eff(rkr->efx_order[i])].Nom);
+			M_IO_CONTROL->setPedalName(4,rkr->efx_names[Busca_Eff(rkr->efx_order[i])].Nom);
 			if ((rkr->deachide) && (!rkr->active[i])) L5->hide(); else L5->show();
 			break;
 		case 5:
 			L6->copy_label(rkr->efx_names[Busca_Eff(rkr->efx_order[i])].Nom);
+			M_IO_CONTROL->setPedalName(5,rkr->efx_names[Busca_Eff(rkr->efx_order[i])].Nom);
 			if ((rkr->deachide) && (!rkr->active[i])) L6->hide(); else L6->show();
 			break;
 		case 6:
 			L7->copy_label(rkr->efx_names[Busca_Eff(rkr->efx_order[i])].Nom);
+			M_IO_CONTROL->setPedalName(6,rkr->efx_names[Busca_Eff(rkr->efx_order[i])].Nom);
 			if ((rkr->deachide) && (!rkr->active[i])) L7->hide(); else L7->show();
 			break;
 		case 7:
 			L8->copy_label(rkr->efx_names[Busca_Eff(rkr->efx_order[i])].Nom);
+			M_IO_CONTROL->setPedalName(7,rkr->efx_names[Busca_Eff(rkr->efx_order[i])].Nom);
 			if ((rkr->deachide) && (!rkr->active[i])) L8->hide(); else L8->show();
 			break;
 		case 8:
 			L9->copy_label(rkr->efx_names[Busca_Eff(rkr->efx_order[i])].Nom);
+			M_IO_CONTROL->setPedalName(8,rkr->efx_names[Busca_Eff(rkr->efx_order[i])].Nom);
 			if ((rkr->deachide) && (!rkr->active[i])) L9->hide(); else L9->show();
 			break;
 		case 9:
 			L10->copy_label(rkr->efx_names[Busca_Eff(rkr->efx_order[i])].Nom);
+			M_IO_CONTROL->setPedalName(9,rkr->efx_names[Busca_Eff(rkr->efx_order[i])].Nom);
 			if ((rkr->deachide) && (!rkr->active[i])) L10->hide(); else L10->show();
 			break;
 		}
@@ -27557,15 +27567,15 @@ void RKRGUI::update_looper() {
 		M_IO_CONTROL->setLooperName(1);
 	}else{
 		if(rkr->efx_Looper->progstate[1]==1){
-			//STOP
-			M_IO_CONTROL->setLooperName(0);
+			//PAUSE
+			M_IO_CONTROL->setLooperName(3);
 		}else{
 			if(rkr->efx_Looper->progstate[0]==1){
 				//PLAY
 				M_IO_CONTROL->setLooperName(2);
 			}else{
-				//NONE
-				M_IO_CONTROL->setLooperName(3);
+				//STOP
+				M_IO_CONTROL->setLooperName(0);
 			}
 		}
 	}
