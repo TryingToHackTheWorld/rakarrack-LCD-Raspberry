@@ -23443,6 +23443,7 @@ void RKRGUI::Put_Loaded() {
 
 
 	WPreset_Name->value(rkr->Preset_Name);
+	M_IO_CONTROL->setPresetName(m_process->Active_Preset.Preset_Name);
 	DAuthor->copy_label(rkr->Author);
 
 	Nivel_Entrada->value((int)(rkr->Input_Gain * 100.0) - 50);
@@ -23450,8 +23451,9 @@ void RKRGUI::Put_Loaded() {
 	Nivel_Salida->value((int)(rkr->Master_Volume * 100.0) - 50);
 	rkr->calculavol(2);
 	Balance->value((int)(rkr->Fraction_Bypass * 100.0));
-
-
+	
+	M_IO_CONTROL->setPresetNumber(m_process->Selected_Preset);
+	
 	ActivarGeneral->value(rkr->Bypass);
 
 	if (rkr->Bypass == 0)
@@ -27550,7 +27552,7 @@ void RKRGUI::update_looper() {
 	looper_t1->redraw();
 	looper_t2->value(rkr->efx_Looper->progstate[5]);
 	looper_t2->redraw();
-	if(Efx_Looper->progstate[2]==1){
+	/*if(Efx_Looper->progstate[2]==1){
 		//RECORD
 		M_IO_CONTROL->setLooperName(1);
 	}else{
@@ -27566,7 +27568,7 @@ void RKRGUI::update_looper() {
 				M_IO_CONTROL->setLooperName(3);
 			}
 		}
-	}
+	}*/
 }
 
 void RKRGUI::UpdateTGUI() {
