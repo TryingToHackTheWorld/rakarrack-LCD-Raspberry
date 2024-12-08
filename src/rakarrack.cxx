@@ -2,6 +2,7 @@
 
 #include "rakarrack.h"
 #include "icono_rakarrack_128x128.xpm"
+#include "IOControl.C"
 static Fl_Tiled_Image* back;
 static Fl_Color leds_color;
 static Fl_Color back_color;
@@ -19,6 +20,8 @@ static int nt;
 static int tta;
 static int Scope_ON;
 static int Analyzer_ON;
+
+IOControl *M_IO_CONTROL = new IOControl();
 
 Analyzer::Analyzer(int x, int y, int w, int h, const char* label) :Fl_Box(x, y, w, h, label) {
 }
@@ -27547,6 +27550,23 @@ void RKRGUI::update_looper() {
 	looper_t1->redraw();
 	looper_t2->value(rkr->efx_Looper->progstate[5]);
 	looper_t2->redraw();
+	if(Efx_Looper->progstate[2]==1){
+		//RECORD
+		M_IO_CONTROL->setLooperName(1);
+	}else{
+		if(Efx_Looper->progstate[1]==1){
+			//STOP
+			M_IO_CONTROL->setLooperName(0);
+		}else{
+			if(Efx_Looper->progstate[0]==1){
+				//PLAY
+				M_IO_CONTROL->setLooperName(2);
+			}else{
+				//NONE
+				M_IO_CONTROL->setLooperName(3);
+			}
+		}
+	}
 }
 
 void RKRGUI::UpdateTGUI() {
