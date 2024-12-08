@@ -21,16 +21,24 @@ IOControl::setPedalStatus(int pedal, int status)
 	switch(status)
 	{
         case 0:
-            std::cout << "OFF";
+	    //Pedal is OFF
+	    if(num[10] == 0){
+		//FX is OFF
+		std::cout << "OFF";
+	    }else{
+		//FX is ON
+		std::cout << "GREEN";
+	    }
             break;
         case 1:
-            std::cout << "Green";
-            break;
-        case 2:
-            std::cout << "Red";
-            break;
-        case 3:
-            std::cout << "Green+Red";
+	    //Pedal is ON
+	    if(num[10] == 0){
+		//FX is OFF
+		std::cout << "BOTH";
+	    }else{
+		//FX is ON
+		std::cout << "RED";
+	    }
             break;
     }
 	std::cout << "\r\n";
@@ -56,12 +64,11 @@ IOControl::setFXStatus(bool status)
     if(status){
         num[10] = 1;
         std::cout << "FX " << " - ON\r\n";
-        pedalUpdate();
     }else{
         num[10] = 0;
         std::cout << "FX " << " - OFF\r\n";
-        pedalUpdate();
     }
+    pedalUpdate();
 }
 
 void
@@ -91,23 +98,7 @@ IOControl::setLooperName(int status){
 
 void
 IOControl::pedalUpdate(){
-	for(int cont=0;cont<10;cont++){
-        if(num[10] == 0){
-            if(num[cont] == 1){
-                setPedalStatus(cont, 0);
-            }else{
-                if(num[cont] == 2){
-                    setPedalStatus(cont, 3);
-                }
-            }
-        }else{
-            if(num[cont] == 0){
-                setPedalStatus(cont, 1);
-            }else{
-                if(num[cont] == 3){
-                    setPedalStatus(cont, 2);
-                }
-            }
-        }
+    for(int cont=0;cont<10;cont++){
+	setPedalStatus(cont, num[cont]);
     }
 }
