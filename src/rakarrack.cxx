@@ -9160,6 +9160,12 @@ void RKRGUI::cb_ActivarGeneral_i(Fl_Light_Button* o, void*) {
 	output_vul->value(-50.0);
 	output_vur->value(-50.0);
 
+	if(rkr->Bypass){
+		M_IO_CONTROL->setFXStatus(true);
+	}else{
+		M_IO_CONTROL->setFXStatus(false);
+	}
+	
 	ChangeActives();
 	LABEL_IO->redraw_label();
 
