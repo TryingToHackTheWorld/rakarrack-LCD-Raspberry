@@ -27073,73 +27073,73 @@ void RKRGUI::ChangeActives() {
 
 	if (rkr->active[0]){
 		L1->labelcolor(on);
-		M_IO_CONTROL->setPedalStatus(0,1);
+		//M_IO_CONTROL->setPedalStatus(0,1);
 	}else{
 		L1->labelcolor(off);
-		M_IO_CONTROL->setPedalStatus(0,0);
+		//M_IO_CONTROL->setPedalStatus(0,0);
 	}
 	if (rkr->active[1]){
 		L2->labelcolor(on);
-		M_IO_CONTROL->setPedalStatus(1,1);
+		//M_IO_CONTROL->setPedalStatus(1,1);
 	}else{
 		L2->labelcolor(off);
-		M_IO_CONTROL->setPedalStatus(1,0);
+		//M_IO_CONTROL->setPedalStatus(1,0);
 	}
 	if (rkr->active[2]){
 		L3->labelcolor(on);
-		M_IO_CONTROL->setPedalStatus(2,1);
+		//M_IO_CONTROL->setPedalStatus(2,1);
 	}else{
 		L3->labelcolor(off);
-		M_IO_CONTROL->setPedalStatus(2,0);
+		//M_IO_CONTROL->setPedalStatus(2,0);
 	}
 	if (rkr->active[3]){
 		L4->labelcolor(on);
-		M_IO_CONTROL->setPedalStatus(3,1);
+		//M_IO_CONTROL->setPedalStatus(3,1);
 	}else{
 		L4->labelcolor(off);
-		M_IO_CONTROL->setPedalStatus(3,0);
+		//M_IO_CONTROL->setPedalStatus(3,0);
 	}
 	if (rkr->active[4]){
 		L5->labelcolor(on);
-		M_IO_CONTROL->setPedalStatus(4,1);
+		//M_IO_CONTROL->setPedalStatus(4,1);
 	}else{
 		L5->labelcolor(off);
-		M_IO_CONTROL->setPedalStatus(4,0);
+		//M_IO_CONTROL->setPedalStatus(4,0);
 	}
 	if (rkr->active[5]){
 		L6->labelcolor(on);
-		M_IO_CONTROL->setPedalStatus(5,1);
+		//M_IO_CONTROL->setPedalStatus(5,1);
 	}else{
 		L6->labelcolor(off);
-		M_IO_CONTROL->setPedalStatus(5,0);
+		//M_IO_CONTROL->setPedalStatus(5,0);
 	}
 	if (rkr->active[6]){
 		L7->labelcolor(on);
-		M_IO_CONTROL->setPedalStatus(6,1);
+		//M_IO_CONTROL->setPedalStatus(6,1);
 	}else{
 		L7->labelcolor(off);
-		M_IO_CONTROL->setPedalStatus(6,0);
+		//M_IO_CONTROL->setPedalStatus(6,0);
 	}
 	if (rkr->active[7]){
 		L8->labelcolor(on);
-		M_IO_CONTROL->setPedalStatus(7,1);
+		//M_IO_CONTROL->setPedalStatus(7,1);
 	}else{
 		L8->labelcolor(off);
-		M_IO_CONTROL->setPedalStatus(7,0);
+		//M_IO_CONTROL->setPedalStatus(7,0);
 	}
 	if (rkr->active[8]){
 		L9->labelcolor(on);
-		M_IO_CONTROL->setPedalStatus(8,1);
+		//M_IO_CONTROL->setPedalStatus(8,1);
 	}else{
 		L9->labelcolor(off);
-		M_IO_CONTROL->setPedalStatus(8,0);
+		//M_IO_CONTROL->setPedalStatus(8,0);
 	}
 	if (rkr->active[9]){
 		L10->labelcolor(on);
-		M_IO_CONTROL->setPedalStatus(9,1);
+		//M_IO_CONTROL->setPedalStatus(9,1);
 	}else{
 		L10->labelcolor(off);
-		M_IO_CONTROL->setPedalStatus(9,0);
+		//M_IO_CONTROL->setPedalStatus(9,0);
 	}
 	
 	if (rkr->MIDIConverter_Bypass) MIDI_LABEL->labelcolor(on); else MIDI_LABEL->labelcolor(off);
