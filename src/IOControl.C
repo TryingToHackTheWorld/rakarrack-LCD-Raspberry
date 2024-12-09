@@ -68,7 +68,7 @@ IOControl::setFXStatus(bool status)
         num[10] = 0;
         std::cout << "FX " << " - OFF\r\n";
     }
-    pedalUpdate();
+    //pedalUpdate();
 }
 
 void
@@ -95,10 +95,10 @@ IOControl::setLooperName(int status){
     }
 	std::cout << "Looper - " << lcdLooper << "\r\n";
 }
-
+/*
 void
 IOControl::pedalUpdate(){
     for(int cont=0;cont<10;cont++){
 	setPedalStatus(cont, num[cont]);
     }
-}
+}*/
