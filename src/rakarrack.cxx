@@ -23961,7 +23961,7 @@ void RKRGUI::reordena() {
 	OTREM->hide();
 	VIBE->hide();
 
-
+	M_IO_CONTROL->LCDClean();
 
 
 	// Show   
