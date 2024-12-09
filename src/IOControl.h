@@ -16,7 +16,7 @@ private:
 	char lcdPreset[17]; //Preset LCD
 	//char lcdLooper[5]; //Looper LCD
 	const char *lcdLooper; //Looper LCD
-	void pedalUpdate();
+	//void pedalUpdate();
 };
 
 #endif
