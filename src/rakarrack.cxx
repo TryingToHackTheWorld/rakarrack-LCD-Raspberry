@@ -23458,6 +23458,7 @@ void RKRGUI::Put_Loaded() {
 	Balance->value((int)(rkr->Fraction_Bypass * 100.0));
 	
 	M_IO_CONTROL->setPresetNumber(rkr->Selected_Preset);
+	M_IO_CONTROL->LCDClean();
 	
 	ActivarGeneral->value(rkr->Bypass);
 
@@ -23960,8 +23961,6 @@ void RKRGUI::reordena() {
 	COMPBAND->hide();
 	OTREM->hide();
 	VIBE->hide();
-
-	M_IO_CONTROL->LCDClean();
 
 
 	// Show   
