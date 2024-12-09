@@ -72,10 +72,12 @@ IOControl::setFXStatus(bool status)
 
 void
 IOControl::setLooperName(int status){
-    /* 0 = Stop
-    *  1 = Reco
-    *  2 = Play
-    *  3 = Paus
+    /* 0 = STOP
+    *  1 = RECO
+    *  2 = PLAY
+    *  3 = PAUS
+    *  4 = PLPS
+    *  5 = ""
     */
 	switch(status)
 	{
@@ -91,6 +93,12 @@ IOControl::setLooperName(int status){
         case 3:
             lcdLooper = "PAUS";
             break;
+	case 4:
+            lcdLooper = "PLPS";
+            break;
+	case 5:
+            lcdLooper = "";
+            break;
     }
 	std::cout << "Looper - " << lcdLooper << "\r\n";
 }
@@ -98,6 +106,8 @@ IOControl::setLooperName(int status){
 void
 IOControl::LCDClean(){
     for(int cont=0;cont<10;cont++){
-	setPedalStatus(cont, num[cont]);
+	setPedalStatus(cont, 0);
+	setPedalName(cont, "");
     }
+    setLooperName(5);
 }
