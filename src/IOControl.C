@@ -1,14 +1,21 @@
 #include "IOControl.h"
 #include <iostream>
 #include <linux/i2c-dev.h>
-//#include <sys/ioctl.h>
+
+IOControl::IOControl(){
+	const char *charBus1 = "/dev/i2c-1";
+	const char *charBus2 = "/dev/i2c-2";
+	int bus1 = open_i2c_device(charBus1);
+	int bus2 = open_i2c_device(charBus2);
+};
 
 void
 IOControl::setPedalName(int pedal, const char* name)
 {
 	strncpy(lcdPedal[pedal], name, 8);
 	std::cout << "Pedal " << pedal << " - " << lcdPedal[pedal] << "\r\n";
-}
+	//int result = jrk_set_target(fd, address, new_target);
+};
 
 void
 IOControl::setPedalStatus(int pedal, int status)
@@ -44,21 +51,21 @@ IOControl::setPedalStatus(int pedal, int status)
             break;
     }
 	std::cout << "\r\n";
-}
+};
 
 void
 IOControl::setPresetName(const char* name)
 {
 	strncpy(lcdPreset, name, 16);
 	std::cout << "preset " << " - " << lcdPreset << "\r\n";
-}
+};
 
 void
 IOControl::setPresetNumber(int number)
 {
     num[11] = number;
     std::cout << "preset number " << " - " << num[11] << "\r\n";
-}
+};
 
 void
 IOControl::setFXStatus(bool status)
@@ -70,7 +77,7 @@ IOControl::setFXStatus(bool status)
         num[10] = 0;
         std::cout << "FX " << " - OFF\r\n";
     }
-}
+};
 
 void
 IOControl::setLooperName(int status){
@@ -103,7 +110,7 @@ IOControl::setLooperName(int status){
             break;
     }
 	std::cout << "Looper - " << lcdLooper << "\r\n";
-}
+};
 
 void
 IOControl::LCDClean(){
@@ -112,4 +119,4 @@ IOControl::LCDClean(){
 	setPedalName(cont, "");
     }
     setLooperName(5);
-}
+};
