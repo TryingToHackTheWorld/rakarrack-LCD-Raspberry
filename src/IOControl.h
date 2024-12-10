@@ -4,6 +4,7 @@
 class IOControl
 {
 public:
+	IOControl ();
 	void setPedalName(int pedal, const char* name);
 	void setPedalStatus(int pedal, int status);
 	void setPresetName(const char* name);
@@ -16,6 +17,10 @@ private:
 	char lcdPedal[10][9]; //10 x LCD 8char screen
 	char lcdPreset[17]; //Preset LCD
 	const char *lcdLooper; //Looper LCD
+	const char *charBus1;
+	const char *charBus2;
+	int bus1;
+	int bus2;
 };
 
 #endif
