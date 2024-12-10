@@ -1,5 +1,7 @@
 #include "IOControl.h"
 #include <iostream>
+#include <linux/i2c-dev.h>
+//#include <sys/ioctl.h>
 
 void
 IOControl::setPedalName(int pedal, const char* name)
