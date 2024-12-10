@@ -2,7 +2,7 @@
 
 #include "rakarrack.h"
 #include "icono_rakarrack_128x128.xpm"
-#include "IOControl.C"
+#include "IOControl.h"
 static Fl_Tiled_Image* back;
 static Fl_Color leds_color;
 static Fl_Color back_color;
