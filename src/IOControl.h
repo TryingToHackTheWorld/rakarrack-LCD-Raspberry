@@ -21,6 +21,7 @@ private:
 	const char *charBus2;
 	int bus1;
 	int bus2;
+	int open_i2c_device(const char * device)
 };
 
 #endif
