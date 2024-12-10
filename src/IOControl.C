@@ -2,6 +2,18 @@
 #include <iostream>
 #include <linux/i2c-dev.h>
 
+int
+IOControl::open_i2c_device(const char * device)
+{
+  int fd = open(device, O_RDWR);
+  if (fd == -1)
+  {
+    perror(device);
+    return -1;
+  }
+  return fd;
+};
+
 IOControl::IOControl(){
 	const char *charBus1 = "/dev/i2c-1";
 	const char *charBus2 = "/dev/i2c-2";
