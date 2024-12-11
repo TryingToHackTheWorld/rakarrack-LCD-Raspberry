@@ -14,6 +14,20 @@ IOControl::open_i2c_device(const char * device)
   return fd;
 };
 
+/*
+void
+IOControl::set_target(int fd, uint8_t address, uint16_t target)
+{
+  uint8_t command[] = {
+    (uint8_t)(0xC0 + (target & 0x1F)),
+    (uint8_t)((target >> 5) & 0x7F),
+  };
+  struct i2c_msg message = { address, 0, sizeof(command), command };
+  struct i2c_rdwr_ioctl_data ioctl_data = { &message, 1 };
+  int result = ioctl(fd, I2C_RDWR, &ioctl_data);
+};
+*/
+
 IOControl::IOControl(){
 	const char *charBus1 = "/dev/i2c-1";
 	const char *charBus2 = "/dev/i2c-2";
@@ -27,6 +41,7 @@ IOControl::setPedalName(int pedal, const char* name)
 	strncpy(lcdPedal[pedal], name, 8);
 	std::cout << "Pedal " << pedal << " - " << lcdPedal[pedal] << "\r\n";
 	//int result = jrk_set_target(fd, address, new_target);
+	//jrk_set_target(fd, address, new_target);
 };
 
 void
