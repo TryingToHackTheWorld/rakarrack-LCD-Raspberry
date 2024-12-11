@@ -14,9 +14,8 @@ IOControl::open_i2c_device(const char * device)
   return fd;
 };
 
-/*
 void
-IOControl::set_target(int fd, uint8_t address, uint16_t target)
+IOControl::set_target(int bus, uint8_t address, uint16_t target)
 {
   uint8_t command[] = {
     (uint8_t)(0xC0 + (target & 0x1F)),
@@ -24,9 +23,8 @@ IOControl::set_target(int fd, uint8_t address, uint16_t target)
   };
   struct i2c_msg message = { address, 0, sizeof(command), command };
   struct i2c_rdwr_ioctl_data ioctl_data = { &message, 1 };
-  int result = ioctl(fd, I2C_RDWR, &ioctl_data);
+  int result = ioctl(bus, I2C_RDWR, &ioctl_data);
 };
-*/
 
 IOControl::IOControl(){
 	const char *charBus1 = "/dev/i2c-1";
