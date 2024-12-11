@@ -17,8 +17,14 @@ IOControl::open_i2c_device(const char * device)
 };
 
 void
-IOControl::send_data(int bus, uint8_t address, uint16_t value)
+IOControl::send_data(int busN, uint8_t address, uint16_t value)
 {
+  int bus;
+  if(busN == 1){
+    bus = bus1;
+  }else{
+    bus = bus2;
+  }
   uint8_t command[] = {
     (uint8_t)(0xC0 + (value & 0x1F)),
     (uint8_t)((value >> 5) & 0x7F),
@@ -36,8 +42,8 @@ IOControl::send_data(int bus, uint8_t address, uint16_t value)
 IOControl::IOControl(){
 	const char *charBus1 = "/dev/i2c-1";
 	const char *charBus2 = "/dev/i2c-2";
-	int bus1 = open_i2c_device(charBus1);
-	int bus2 = open_i2c_device(charBus2);
+	bus1 = open_i2c_device(charBus1);
+	bus2 = open_i2c_device(charBus2);
 };
 
 void
