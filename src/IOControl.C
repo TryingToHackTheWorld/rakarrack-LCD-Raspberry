@@ -1,6 +1,8 @@
 #include "IOControl.h"
 #include <iostream>
 #include <linux/i2c-dev.h>
+#include <linux/i2c.h>
+#include <sys/ioctl.h>
 
 int
 IOControl::open_i2c_device(const char * device)
@@ -15,15 +17,20 @@ IOControl::open_i2c_device(const char * device)
 };
 
 void
-IOControl::set_target(int bus, uint8_t address, uint16_t target)
+IOControl::send_data(int bus, uint8_t address, uint16_t value)
 {
   uint8_t command[] = {
-    (uint8_t)(0xC0 + (target & 0x1F)),
-    (uint8_t)((target >> 5) & 0x7F),
+    (uint8_t)(0xC0 + (value & 0x1F)),
+    (uint8_t)((value >> 5) & 0x7F),
   };
-  struct i2c_msg message = { address, 0, sizeof(command), command };
+  struct i2c_msg message = {
+    address,
+    0,
+    sizeof(command),
+    command
+  };
   struct i2c_rdwr_ioctl_data ioctl_data = { &message, 1 };
-  int result = ioctl(bus, I2C_RDWR, &ioctl_data);
+  /*int result = */ioctl(bus, I2C_RDWR, &ioctl_data);
 };
 
 IOControl::IOControl(){
