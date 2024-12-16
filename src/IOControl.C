@@ -150,6 +150,11 @@ IOControl::setLooperName(int status){
             break;
     }
 	std::cout << "Looper - " << lcdLooper << "\r\n";
+//P=i2cset -y 1 0x70 0x00 0xf3
+//L=i2cset -y 1 0x70 0x02 0x38
+//A=i2cset -y 1 0x70 0x04 0xf7
+//Y=i2cset -y 1 0x70 0x05 0x
+//  i2cset -y 1 0x70 0x06 0x
 };
 
 void
