@@ -96,6 +96,8 @@ IOControl::setPresetName(const char* name)
 {
 	strncpy(lcdPreset, name, 16);
 	std::cout << "preset " << " - " << lcdPreset << "\r\n";
+	const uint8_t address = 27;
+	send_data(bus1, address, lcdPreset);
 };
 
 void
