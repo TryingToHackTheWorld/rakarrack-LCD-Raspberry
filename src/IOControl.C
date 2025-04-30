@@ -49,8 +49,8 @@ IOControl::IOControl(){
 void
 IOControl::setPedalName(int pedal, const char* name)
 {
-	strncpy(lcdPedal[pedal], name, 8);
-	std::cout << "Pedal " << pedal << " - " << lcdPedal[pedal] << "\r\n";
+	strncpy(lcdPedal[pedal], name, 9);
+	std::cout << "Pedal Name " << pedal << " - " << lcdPedal[pedal] << "\r\n";
 	//int result = jrk_set_target(fd, address, new_target);
 	//jrk_set_target(fd, address, new_target);
 };
@@ -64,7 +64,7 @@ IOControl::setPedalStatus(int pedal, int status)
 	*  3 = both on
 	*/
 	num[pedal] = status;
-	std::cout << "Pedal " << pedal << " - ";
+	std::cout << "Pedal Status " << pedal << " - ";
 	switch(status)
 	{
         case 0:
