@@ -22,7 +22,7 @@ private:
 	int bus1;
 	int bus2;
 	int open_i2c_device(const char * device);
-	void sendToI2C(int bus_fd, uint8_t address, const char* text, int length);
+	void sendToI2C(int bus, uint8_t address, char* text);
 };
 
 #endif
