@@ -3,6 +3,7 @@
 #include <linux/i2c-dev.h>
 #include <linux/i2c.h>
 #include <sys/ioctl.h>
+#include "lcd1602.h"
 
 int
 IOControl::open_i2c_device(const char * device)
@@ -16,27 +17,31 @@ IOControl::open_i2c_device(const char * device)
   return fd;
 };
 
+void IOControl::sendToI2C(int bus_fd, uint8_t address, const char* text, int length) {
+    if (bus_fd < 0) {
+        std::cerr << "Bus I2C no inicializado correctamente.\n";
+        return;
+    }
+
+    if (ioctl(bus_fd, I2C_SLAVE, address) < 0) {
+        std::cerr << "Error al seleccionar el dispositivo I2C en 0x"
+                  << std::hex << (int)address << std::endl;
+        return;
+    }
+
+    if (write(bus_fd, text, length) != length) {
+        std::cerr << "Fallo al escribir en el dispositivo I2C 0x"
+                  << std::hex << (int)address << std::endl;
+        return;
+    }
+};
+
 void
-IOControl::send_data(int busN, uint8_t address, uint16_t value)
+IOControl::setPresetName(const char* name)
 {
-  int bus;
-  if(busN == 1){
-    bus = bus1;
-  }else{
-    bus = bus2;
-  }
-  uint8_t command[] = {
-    (uint8_t)(0xC0 + (value & 0x1F)),
-    (uint8_t)((value >> 5) & 0x7F),
-  };
-  struct i2c_msg message = {
-    address,
-    0,
-    sizeof(command),
-    command
-  };
-  struct i2c_rdwr_ioctl_data ioctl_data = { &message, 1 };
-  /*int result = */ioctl(bus, I2C_RDWR, &ioctl_data);
+	strncpy(lcdPreset, name, 16);
+	std::cout << "preset " << " - " << lcdPreset << "\r\n";
+	sendToI2C(bus1, 0x27, name, 16);
 };
 
 IOControl::IOControl(){
@@ -89,17 +94,6 @@ IOControl::setPedalStatus(int pedal, int status)
             break;
     }
 	std::cout << "\r\n";
-};
-
-void
-IOControl::setPresetName(const char* name)
-{
-	strncpy(lcdPreset, name, 16);
-	std::cout << "preset " << " - " << lcdPreset << "\r\n";
-	const uint8_t address = 27;
-	//send_data(bus1, address, lcdPreset);
-	uint16_t value = static_cast<uint16_t>(std::atoi(lcdPreset));
-	send_data(bus1, address, value);
 };
 
 void
