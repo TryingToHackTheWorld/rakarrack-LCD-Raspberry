@@ -3,7 +3,7 @@
 #include <linux/i2c-dev.h>
 #include <linux/i2c.h>
 #include <sys/ioctl.h>
-#include "lcd1602.h"
+#include "lcd1602.c"
 
 int
 IOControl::open_i2c_device(const char * device)
@@ -17,23 +17,17 @@ IOControl::open_i2c_device(const char * device)
   return fd;
 };
 
-void IOControl::sendToI2C(int bus_fd, uint8_t address, const char* text, int length) {
-    if (bus_fd < 0) {
-        std::cerr << "Bus I2C no inicializado correctamente.\n";
-        return;
-    }
-
-    if (ioctl(bus_fd, I2C_SLAVE, address) < 0) {
-        std::cerr << "Error al seleccionar el dispositivo I2C en 0x"
-                  << std::hex << (int)address << std::endl;
-        return;
-    }
-
-    if (write(bus_fd, text, length) != length) {
-        std::cerr << "Fallo al escribir en el dispositivo I2C 0x"
-                  << std::hex << (int)address << std::endl;
-        return;
-    }
+void IOControl::sendToI2C(int bus, uint8_t address, char* text) {
+	//ioctl(bus, I2C_SLAVE, address);
+	/*if (ioctl(bus, I2C_SLAVE, address) < 0) {
+		std::cout << "Failed to acquire bus access and/or talk to slave";
+		return;
+	}*/
+	lcd1602Init(bus, address);
+    lcd1602Clear();
+    lcd1602SetCursor(0, 0);
+    lcd1602WriteString(text);
+	lcd1602Close();
 };
 
 void
@@ -41,14 +35,14 @@ IOControl::setPresetName(const char* name)
 {
 	strncpy(lcdPreset, name, 16);
 	std::cout << "preset " << " - " << lcdPreset << "\r\n";
-	sendToI2C(bus1, 0x27, name, 16);
+	sendToI2C(1, 0x27, lcdPreset);
 };
 
 IOControl::IOControl(){
-	const char *charBus1 = "/dev/i2c-1";
+	/*const char *charBus1 = "/dev/i2c-1";
 	const char *charBus2 = "/dev/i2c-2";
 	bus1 = open_i2c_device(charBus1);
-	bus2 = open_i2c_device(charBus2);
+	bus2 = open_i2c_device(charBus2);*/
 };
 
 void
@@ -56,8 +50,6 @@ IOControl::setPedalName(int pedal, const char* name)
 {
 	strncpy(lcdPedal[pedal], name, 9);
 	std::cout << "Pedal Name " << pedal << " - " << lcdPedal[pedal] << "\r\n";
-	//int result = jrk_set_target(fd, address, new_target);
-	//jrk_set_target(fd, address, new_target);
 };
 
 void
