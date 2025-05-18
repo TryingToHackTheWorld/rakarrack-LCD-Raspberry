@@ -1,5 +1,5 @@
-#ifndef LCD1602_H
-#define LCD1602_H
+#ifndef LCD1601_H
+#define LCD1601_H
 //
 // LCD1602 2 line by 16 character LCD library
 //
