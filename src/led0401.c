@@ -42,12 +42,12 @@ void init_ht16k33(int i2c_fd, uint8_t address) {
 }
 
 void led0401write(int bus, uint8_t address, char* text){
-	int try = 0;
+	int cont = 0;
 	
-	while (try < 3){
+	while (cont < 3){
 		if (ioctl(bus, I2C_SLAVE, address) < 0) {
 			std::cout << "FAIL writing\r\n";
-			try++;
+			cont++;
 		}else{		
 			uint8_t buffer[17];  // 0x00 register + 8x2 bytes = 17
 			memset(buffer, 0, sizeof(buffer));
@@ -59,7 +59,7 @@ void led0401write(int bus, uint8_t address, char* text){
 				buffer[2 + i * 2] = segs >> 8;
 			}
 			write(bus, buffer, sizeof(buffer));
-			try = 3;
+			cont = 3;
 		}
 	}
 }
