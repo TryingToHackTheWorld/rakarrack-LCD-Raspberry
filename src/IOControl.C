@@ -3,7 +3,60 @@
 #include <linux/i2c-dev.h>
 #include <linux/i2c.h>
 #include <sys/ioctl.h>
-#include "lcd1602.c"
+#include "lcd1601.c"
+#include "led0401.c"
+#include "led0201.c"
+
+uint8_t address[10] = {0x27, 0x28, 0x29, 0x30, 0x31, 0x32, 0x32, 0x33, 0x34, 0x35};
+
+void
+IOControl::sendTo8LCD(int bus, uint8_t address, char* text)
+{
+	std::cout << "Pedal Name - " << text << "\r\n";
+	/*lcdInit(bus, address);
+    lcdClear0801();
+    lcdWriteString0801(text);
+	lcdClose();*/
+};
+
+void 
+IOControl::sendTo16LCD(int bus, uint8_t address, char* text)
+{
+	std::cout << "preset - " << text << "\r\n";
+	/*lcdInit(bus, address);
+    lcdClear1601();
+    lcdWriteString1601(text);
+	lcdClose();*/
+};
+
+void
+IOControl::sendTo2LED(int bus, uint8_t address, int number)
+{
+	std::cout << "preset number - " << number << "\r\n";
+}
+
+void
+IOControl::sendTo4LED(int bus, uint8_t address, char* text)
+{
+	std::cout << "Looper - " << text << "\r\n";
+	led0401write(bus,address,text);
+}
+
+void
+IOControl::setPresetName(const char* name)
+{
+	strncpy(lcdPreset, name, 16);
+	sendTo16LCD(bus1, 0x27, lcdPreset);
+	setLooperName(5);
+};
+
+IOControl::IOControl(){
+	const char *charBus1 = "/dev/i2c-1";
+	const char *charBus2 = "/dev/i2c-2";
+	bus1 = open_i2c_device(charBus1);
+	bus2 = open_i2c_device(charBus2);
+	init_ht16k33(bus1, 0x70);
+};
 
 int
 IOControl::open_i2c_device(const char * device)
@@ -17,39 +70,11 @@ IOControl::open_i2c_device(const char * device)
   return fd;
 };
 
-void IOControl::sendToI2C(int bus, uint8_t address, char* text) {
-	//ioctl(bus, I2C_SLAVE, address);
-	/*if (ioctl(bus, I2C_SLAVE, address) < 0) {
-		std::cout << "Failed to acquire bus access and/or talk to slave";
-		return;
-	}*/
-	lcd1602Init(bus, address);
-    lcd1602Clear();
-    lcd1602SetCursor(0, 0);
-    lcd1602WriteString(text);
-	lcd1602Close();
-};
-
-void
-IOControl::setPresetName(const char* name)
-{
-	strncpy(lcdPreset, name, 16);
-	std::cout << "preset " << " - " << lcdPreset << "\r\n";
-	sendToI2C(1, 0x27, lcdPreset);
-};
-
-IOControl::IOControl(){
-	/*const char *charBus1 = "/dev/i2c-1";
-	const char *charBus2 = "/dev/i2c-2";
-	bus1 = open_i2c_device(charBus1);
-	bus2 = open_i2c_device(charBus2);*/
-};
-
 void
 IOControl::setPedalName(int pedal, const char* name)
 {
-	strncpy(lcdPedal[pedal], name, 9);
-	std::cout << "Pedal Name " << pedal << " - " << lcdPedal[pedal] << "\r\n";
+	strncpy(lcdPedal, name, 8);
+	sendTo8LCD(bus2, address[pedal], lcdPedal);
 };
 
 void
@@ -92,7 +117,7 @@ void
 IOControl::setPresetNumber(int number)
 {
     num[11] = number;
-    std::cout << "preset number " << " - " << num[11] << "\r\n";
+	sendTo2LED(bus1, 0x71, number);
 };
 
 void
@@ -114,42 +139,34 @@ IOControl::setLooperName(int status){
     *  2 = PLAY
     *  3 = PAUS
     *  4 = PLPS
-    *  5 = ""
+    *  5 = "    "
     */
 	switch(status)
 	{
         case 0:
-            lcdLooper = "STOP";
+            //lcdLooper = "STOP";
+			strncpy(lcdLooper, "STOP", 5);
             break;
         case 1:
-            lcdLooper = "RECO";
+            //lcdLooper = "RECO";
+			strncpy(lcdLooper, "RECO", 5);
             break;
         case 2:
-            lcdLooper = "PLAY";
+            //lcdLooper = "PLAY";
+			strncpy(lcdLooper, "PLAY", 5);
             break;
         case 3:
-            lcdLooper = "PAUS";
+            //lcdLooper = "PAUS";
+			strncpy(lcdLooper, "PAUS", 5);
             break;
-	case 4:
-            lcdLooper = "PLPS";
+		case 4:
+            //lcdLooper = "PLPS";
+			strncpy(lcdLooper, "PLPS", 5);
             break;
-	case 5:
-            lcdLooper = "";
+		case 5:
+            //lcdLooper = "    ";
+			strncpy(lcdLooper, "    ", 5);
             break;
     }
-	std::cout << "Looper - " << lcdLooper << "\r\n";
-//P=i2cset -y 1 0x70 0x00 0xf3
-//L=i2cset -y 1 0x70 0x02 0x38
-//A=i2cset -y 1 0x70 0x04 0xf7
-//Y=i2cset -y 1 0x70 0x05 0x
-//  i2cset -y 1 0x70 0x06 0x
-};
-
-void
-IOControl::LCDClean(){
-    for(int cont=0;cont<10;cont++){
-	setPedalStatus(cont, 0);
-	setPedalName(cont, "");
-    }
-    setLooperName(5);
+	sendTo4LED(bus1, 0x70, lcdLooper);
 };
