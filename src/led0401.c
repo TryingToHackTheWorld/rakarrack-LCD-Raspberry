@@ -20,7 +20,7 @@ void init_font14seg() {
 void init_ht16k33(int i2c_fd, uint8_t address) {
 	
 	if (ioctl(i2c_fd, I2C_SLAVE, address) < 0) {
-        perror("I2C_SLAVE");
+        std::cout << "INIT FAIL\r\n";
     }else{	
 		init_font14seg();
 	
@@ -41,19 +41,24 @@ void init_ht16k33(int i2c_fd, uint8_t address) {
 }
 
 void led0401write(int bus, uint8_t address, char* text){
-	if (ioctl(bus, I2C_SLAVE, address) < 0) {
-        perror("I2C_SLAVE");
-    }else{		
-		uint8_t buffer[17];  // 0x00 register + 8x2 bytes = 17
-		memset(buffer, 0, sizeof(buffer));
-		buffer[0] = 0x00; // Start at address 0
+	int try = 0;
+	
+	while (try < 3){
+		if (ioctl(bus, I2C_SLAVE, address) < 0) {
+			std::cout << "FAIL writing\r\n";
+			try++;
+		}else{		
+			uint8_t buffer[17];  // 0x00 register + 8x2 bytes = 17
+			memset(buffer, 0, sizeof(buffer));
+			buffer[0] = 0x00; // Start at address 0
 
-		for (int i = 0; i < 4 && text[i]; ++i) {
-			uint16_t segs = font14seg[(unsigned char)text[i]];
-			buffer[1 + i * 2] = segs & 0xFF;
-			buffer[2 + i * 2] = segs >> 8;
+			for (int i = 0; i < 4 && text[i]; ++i) {
+				uint16_t segs = font14seg[(unsigned char)text[i]];
+				buffer[1 + i * 2] = segs & 0xFF;
+				buffer[2 + i * 2] = segs >> 8;
+			}
+			write(bus, buffer, sizeof(buffer));
+			try = 3;
 		}
-
-		write(bus, buffer, sizeof(buffer));
 	}
 }
