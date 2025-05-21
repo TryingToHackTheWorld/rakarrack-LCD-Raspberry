@@ -6,6 +6,7 @@
 #include "lcd1601.c"
 #include "led0401.c"
 #include "led0201.c"
+#include <wiringPi.h>
 
 uint8_t address[10] = {0x27, 0x28, 0x29, 0x30, 0x31, 0x32, 0x32, 0x33, 0x34, 0x35};
 
@@ -13,20 +14,14 @@ void
 IOControl::sendTo8LCD(int bus, uint8_t address, char* text)
 {
 	std::cout << "Pedal Name - " << text << "\r\n";
-	/*lcdInit(bus, address);
-    lcdClear0801();
-    lcdWriteString0801(text);
-	lcdClose();*/
+	//lcd0801WriteString(bus,address,text);
 };
 
 void 
 IOControl::sendTo16LCD(int bus, uint8_t address, char* text)
 {
 	std::cout << "preset - " << text << "\r\n";
-	/*lcdInit(bus, address);
-    lcdClear1601();
-    lcdWriteString1601(text);
-	lcdClose();*/
+	lcd1601WriteString(bus,address,text);
 };
 
 void
@@ -45,17 +40,26 @@ IOControl::sendTo4LED(int bus, uint8_t address, char* text)
 void
 IOControl::setPresetName(const char* name)
 {
-	strncpy(lcdPreset, name, 16);
+	snprintf(lcdPreset, sizeof(lcdPreset), "%s", name);
 	sendTo16LCD(bus1, 0x27, lcdPreset);
 	setLooperName(5);
 };
 
 IOControl::IOControl(){
+	//Encender ventilador
+	wiringPiSetup(); // o wiringPiSetupGpio() si usas número BCM
+    pinMode(21, OUTPUT); // Usando BCM GPIO17
+    digitalWrite(21, HIGH); // Activar el pin
+	
 	const char *charBus1 = "/dev/i2c-1";
 	const char *charBus2 = "/dev/i2c-2";
 	bus1 = open_i2c_device(charBus1);
 	bus2 = open_i2c_device(charBus2);
 	init_ht16k33(bus1, 0x70);
+	init_lcd(bus1, 0x27);
+	/*
+	for todos los address[10], init_lcd(bus2, address[cont]);
+	*/
 };
 
 int
@@ -73,7 +77,7 @@ IOControl::open_i2c_device(const char * device)
 void
 IOControl::setPedalName(int pedal, const char* name)
 {
-	strncpy(lcdPedal, name, 8);
+	snprintf(lcdPedal, sizeof(lcdPedal), "%s", name);
 	sendTo8LCD(bus2, address[pedal], lcdPedal);
 };
 
