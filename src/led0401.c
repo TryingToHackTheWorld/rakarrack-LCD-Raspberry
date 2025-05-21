@@ -3,19 +3,18 @@
 uint16_t font14seg[128] = { 0 }; // Inicializa todo a 0
 
 void init_font14seg() {
-    font14seg[' '] = 0x0000; // Todos los segmentos apagados
-
-    font14seg['A'] = 0x0247; // Segmentos: 1,2,3,5,6,7,10
-    font14seg['C'] = 0x0138; // Segmentos: 1,4,5,6
-    font14seg['E'] = 0x0578; // Segmentos: 1,4,5,6,7,13
-    font14seg['L'] = 0x0038; // Segmentos: 4,5,6
-    font14seg['O'] = 0x003F; // Segmentos: 1,2,3,4,5,6
-    font14seg['P'] = 0x0673; // Segmentos: 1,2,5,6,7,13
-    font14seg['R'] = 0x0677; // Segmentos: 1,2,5,6,7,10,13
-    font14seg['S'] = 0x04DB; // Segmentos: 1,3,4,6,7,13
-    font14seg['T'] = 0x040F; // Segmentos: 1,13,14
-    font14seg['U'] = 0x003F; // Segmentos: 2,3,4,5,6
-    font14seg['Y'] = 0x0456; // Segmentos: 2,5,6,13,14
+    font14seg[' '] = 0x0000;
+    font14seg['A'] = 0x00F7;
+    font14seg['C'] = 0x0039;
+    font14seg['E'] = 0x0079;
+    font14seg['L'] = 0x0038;
+    font14seg['O'] = 0x003F;
+    font14seg['P'] = 0x00F3;
+    font14seg['R'] = 0x20F3;
+    font14seg['S'] = 0x00ED;
+    font14seg['T'] = 0x1201;
+    font14seg['U'] = 0x001E; 
+    font14seg['Y'] = 0x1500;
 }
 
 void init_ht16k33(int i2c_fd, uint8_t address) {
