@@ -28,6 +28,7 @@
 #include <sys/ioctl.h>
 #include <linux/types.h>
 #include <linux/i2c-dev.h>
+#include "lcd1601.h"
 //
 // The LCD controller is wired to the I2C port expander with the upper 4 bits
 // (D4-D7) connected to the data lines and the lower 4 bits (D0-D3) used as
@@ -49,9 +50,65 @@
 static int iBackLight = BACKLIGHT;
 static int file_i2c = -1;
 
+void lcd0801WriteString(int i2c_fd, uint8_t address, char* text){
+	if (ioctl(i2c_fd, I2C_SLAVE, address) < 0) {
+        std::cout << "INIT FAIL\r\n";
+    }else{
+		file_i2c = i2c_fd;
+		
+		lcdWriteString("        ");  // 8 espacios
+		lcdWriteString(text);
+	}
+}
+
+void lcd1601WriteString(int i2c_fd, uint8_t address, char* text){
+	char buf[9] = {0};
+	if (ioctl(i2c_fd, I2C_SLAVE, address) < 0) {
+        std::cout << "INIT FAIL\r\n";
+    }else{
+		file_i2c = i2c_fd;
+		
+		// Borrado linea 1
+		WriteCommand(0x80 + 0x00);  // Set cursor to 0x00
+		lcdWriteString("        ");
+		
+		// Borrado linea 2
+		WriteCommand(0x80 + 0x40);  // Set cursor to 0x40
+		lcdWriteString("        ");
+		
+		// Línea 1 - posición 0x00
+		strncpy(buf, text, 8);
+		WriteCommand(0x80 + 0x00);  // Set cursor to 0x00
+		lcdWriteString(buf);
+
+		// Línea lógica 2 - posición 0x40
+		strncpy(buf, text + 8, 8);
+		WriteCommand(0x80 + 0x40);  // Set cursor to 0x40
+		lcdWriteString(buf);
+	}
+}
+
+void init_lcd(int i2c_fd, uint8_t address){
+	if (ioctl(i2c_fd, I2C_SLAVE, address) < 0) {
+        std::cout << "INIT FAIL\r\n";
+    }else{
+		file_i2c = i2c_fd;
+		
+		iBackLight = BACKLIGHT; // turn on backlight
+	
+		WriteCommand(0x02); // Set 4-bit mode of the LCD controller
+		WriteCommand(0x28); // 2 lines, 5x8 dot matrix
+		WriteCommand(0x0c); // display on, cursor off
+		WriteCommand(0x06); // inc cursor to right when writing and don't scroll
+		WriteCommand(0x80); // set cursor to row 1, column 1
+		WriteCommand(0x0E); // clear the screen
+		WriteCommand(0x0C); // display on, cursor off
+	}
+}
+
 static void WriteCommand(unsigned char ucCMD)
 {
-unsigned char uc;
+	unsigned char uc;
 
 	uc = (ucCMD & 0xf0) | iBackLight; // most significant nibble sent first
 	write(file_i2c, &uc, 1);
@@ -71,41 +128,13 @@ unsigned char uc;
         uc &= ~4; // toggle pulse
         write(file_i2c, &uc, 1);
 	usleep(CMD_PERIOD);
+}
 
-} /* WriteCommand() */
-
-//
-// Control the backlight, cursor, and blink
-// The cursor is an underline and is separate and distinct
-// from the blinking block option
-//
-int lcd1602Control(int bBacklight, int bCursor, int bBlink)
+void lcdWriteString(char *text)
 {
-unsigned char ucCMD = 0xc; // display control
-
-	if (file_i2c < 0)
-		return 1;
-	iBackLight = (bBacklight) ? BACKLIGHT : 0;
-	if (bCursor)
-		ucCMD |= 2;
-	if (bBlink)
-		ucCMD |= 1;
-	WriteCommand(ucCMD);
- 	
-	return 0;
-} /* lcd1602Control() */
-
-//
-// Write an ASCII string (up to 16 characters at a time)
-// 
-int lcd1602WriteString(char *text)
-{
-unsigned char ucTemp[2];
-int i = 0;
-
-	if (file_i2c < 0 || text == NULL)
-		return 1;
-
+	unsigned char ucTemp[2];
+	int i = 0;
+	
 	while (i<16 && *text)
 	{
 		ucTemp[0] = iBackLight | DATA | (*text & 0xf0);
@@ -128,77 +157,4 @@ int i = 0;
 		text++;
 		i++;
 	}
-	return 0;
-} /* WriteString() */
-
-//
-// Erase the display memory and reset the cursor to 0,0
-//
-int lcd1602Clear(void)
-{
-	if (file_i2c < 0)
-		return 1;
-	WriteCommand(0x0E); // clear the screen
-	return 0;
-
-} /* lcd1602Clear() */
-
-//
-// Open a file handle to the I2C device
-// Set the controller into 4-bit mode and clear the display
-// returns 0 for success, 1 for failure
-//
-int lcd1602Init(int iChannel, int iAddr)
-{
-char szFile[32];
-int rc;
-
-	sprintf(szFile, "/dev/i2c-%d", iChannel);
-	file_i2c = open(szFile, O_RDWR);
-	if (file_i2c < 0)
-	{
-		fprintf(stderr, "Error opening i2c device; not running as sudo?\n");
-		return 1;
-	}
-	rc = ioctl(file_i2c, I2C_SLAVE, iAddr);
-	if (rc < 0)
-	{
-		close(file_i2c);
-		fprintf(stderr, "Error setting I2C device address\n");
-		return 1;
-	}
-	iBackLight = BACKLIGHT; // turn on backlight
-	WriteCommand(0x02); // Set 4-bit mode of the LCD controller
-	WriteCommand(0x28); // 2 lines, 5x8 dot matrix
-	WriteCommand(0x0c); // display on, cursor off
-	WriteCommand(0x06); // inc cursor to right when writing and don't scroll
-	WriteCommand(0x80); // set cursor to row 1, column 1
-	lcd1602Clear();	    // clear the memory
-
-	return 0;
-} /* lcd1602Init() */
-
-//
-// Set the LCD cursor position
-//
-int lcd1602SetCursor(int x, int y)
-{
-unsigned char cCmd;
-
-	if (file_i2c < 0 || x < 0 || x > 15 || y < 0 || y > 1)
-		return 1;
-
-	cCmd = (y==0) ? 0x80 : 0xc0;
-	cCmd |= x;
-	WriteCommand(cCmd);
-	return 0;
-
-} /* lcd1602SetCursor() */
-
-void lcd1602Shutdown(void)
-{
-	iBackLight = 0; // turn off backlight
-	WriteCommand(0x08); // turn off display, cursor and blink	
-	close(file_i2c);
-	file_i2c = -1;
-} /* lcd1602Shutdown() */
+}
