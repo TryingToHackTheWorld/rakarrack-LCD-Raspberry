@@ -13,7 +13,7 @@ void init_font14seg() {
     font14seg['R'] = 0x20F3;
     font14seg['S'] = 0x00ED;
     font14seg['T'] = 0x1201;
-    font14seg['U'] = 0x001E; 
+    font14seg['U'] = 0x003E; 
     font14seg['Y'] = 0x1500;
 }
 
