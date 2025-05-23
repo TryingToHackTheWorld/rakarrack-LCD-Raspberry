@@ -6,15 +6,15 @@
 #include "lcd1601.c"
 #include "led0401.c"
 #include "led0201.c"
-#include <wiringPi.h>
 
 uint8_t address[10] = {0x27, 0x28, 0x29, 0x30, 0x31, 0x32, 0x32, 0x33, 0x34, 0x35};
+int last = -1;
 
 void
 IOControl::sendTo8LCD(int bus, uint8_t address, char* text)
 {
 	std::cout << "Pedal Name - " << text << "\r\n";
-	//lcd0801WriteString(bus,address,text);
+	lcd0801WriteString(bus,address,text);
 };
 
 void 
@@ -28,6 +28,7 @@ void
 IOControl::sendTo2LED(int bus, uint8_t address, int number)
 {
 	std::cout << "preset number - " << number << "\r\n";
+	led_0201_show_number(number);
 }
 
 void
@@ -45,21 +46,17 @@ IOControl::setPresetName(const char* name)
 	setLooperName(5);
 };
 
-IOControl::IOControl(){
-	//Encender ventilador
-	wiringPiSetup(); // o wiringPiSetupGpio() si usas número BCM
-    pinMode(21, OUTPUT); // Usando BCM GPIO17
-    digitalWrite(21, HIGH); // Activar el pin
-	
+IOControl::IOControl(){	
 	const char *charBus1 = "/dev/i2c-1";
 	const char *charBus2 = "/dev/i2c-2";
 	bus1 = open_i2c_device(charBus1);
 	bus2 = open_i2c_device(charBus2);
+	led_0201_init("/dev/spidev0.0", 22); //PIN 22 = GPIO 25
 	init_ht16k33(bus1, 0x70);
 	init_lcd(bus1, 0x27);
-	/*
-	for todos los address[10], init_lcd(bus2, address[cont]);
-	*/
+	for(int cont=0; cont<10; cont++){
+		init_lcd(bus2, address[cont]);
+	}
 };
 
 int
@@ -84,11 +81,6 @@ IOControl::setPedalName(int pedal, const char* name)
 void
 IOControl::setPedalStatus(int pedal, int status)
 {
-	/* 0 = both off
-	*  1 = green
-	*  2 = red
-	*  3 = both on
-	*/
 	num[pedal] = status;
 	std::cout << "Pedal Status " << pedal << " - ";
 	switch(status)
@@ -145,6 +137,7 @@ IOControl::setLooperName(int status){
     *  4 = PLPS
     *  5 = "    "
     */
+	
 	switch(status)
 	{
         case 0:
@@ -160,8 +153,13 @@ IOControl::setLooperName(int status){
 			strncpy(lcdLooper, "PLAY", 5);
             break;
         case 3:
-            //lcdLooper = "PAUS";
-			strncpy(lcdLooper, "PAUS", 5);
+			if(last == 2){
+				//lcdLooper = "PLPS";
+				strncpy(lcdLooper, "PLPS", 5);
+			}else{
+				//lcdLooper = "PAUS";
+				strncpy(lcdLooper, "PAUS", 5);
+			}
             break;
 		case 4:
             //lcdLooper = "PLPS";
@@ -172,5 +170,6 @@ IOControl::setLooperName(int status){
 			strncpy(lcdLooper, "    ", 5);
             break;
     }
+	last = status;
 	sendTo4LED(bus1, 0x70, lcdLooper);
 };
