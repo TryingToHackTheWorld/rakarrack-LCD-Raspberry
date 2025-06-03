@@ -56,7 +56,10 @@ void lcd0801WriteString(int i2c_fd, uint8_t address, char* text){
     }else{
 		file_i2c = i2c_fd;
 		
+		WriteCommand(0x80 + 0x00);  // Set cursor to 0x00
 		lcdWriteString("        ");  // 8 espacios
+		
+		WriteCommand(0x80 + 0x00);  // Set cursor to 0x00
 		lcdWriteString(text);
 	}
 }
