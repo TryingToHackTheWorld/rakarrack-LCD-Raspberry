@@ -1,5 +1,5 @@
-#ifndef LCD1602_H
-#define LCD1602_H
+#ifndef LCD1601_H
+#define LCD1601_H
 
 void lcd1601WriteString(int i2c_fd, uint8_t address, char* text);
 void lcd1601WriteString(char *szText);
