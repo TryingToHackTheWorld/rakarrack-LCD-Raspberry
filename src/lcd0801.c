@@ -75,7 +75,7 @@ void lcd0801WriteString(int i2c_fd, uint8_t address, char* text){
 	if (ioctl(i2c_fd, I2C_SLAVE, address) < 0) {
         std::cout << "INIT FAIL\r\n";
     }else{
-		file_i2c_1601 = i2c_fd;
+		file_i2c_0801 = i2c_fd;
 		
 		// Borrado linea 1
 		lcd_send(0x80);
