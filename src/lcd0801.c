@@ -1,61 +1,77 @@
-// lcd0801.c - Controlador de pantalla LCD 0801B via I2C con PCF8574
+// lcd0801.c - Versión adaptada desde prueba Python funcional
 #include "lcd0801.h"
 #include <unistd.h>
+#include <stdint.h>
+#include <string.h>
+#include <stdio.h>
 #include <linux/i2c-dev.h>
 #include <sys/ioctl.h>
-#include <stdint.h>
-#include <stdio.h>
 
-#define LCD_ENABLE      0x04
-#define LCD_BACKLIGHT   0x08
-#define LCD_COMMAND     0
-#define LCD_DATA        1
+// Definición de pines según PCF8574
+#define LCD_RS  0x01  // P0
+#define LCD_RW  0x02  // P1 (no se usa)
+#define LCD_EN  0x04  // P2
+#define LCD_BL  0x08  // P3
 
-static void lcd0801_write_nibble(int fd, uint8_t address, uint8_t nibble, uint8_t mode) {
-    uint8_t data = (nibble & 0xF0) | LCD_BACKLIGHT | (mode ? 0x01 : 0x00);
+#define LCD_D4  0x10  // P4
+#define LCD_D5  0x20  // P5
+#define LCD_D6  0x40  // P6
+#define LCD_D7  0x80  // P7
 
-    ioctl(fd, I2C_SLAVE, address);
-    uint8_t buffer[1];
-
-    buffer[0] = data | LCD_ENABLE;
-    write(fd, buffer, 1);
+static void lcd0801WriteNibble(int bus, uint8_t addr, uint8_t nibble, uint8_t rs)
+{
+    uint8_t data = 0;
+    data |= (nibble & 0x0F) << 4;  // D4-D7
+    data |= rs ? LCD_RS : 0;
+    data |= LCD_BL; // mantener backlight encendido
+    data |= LCD_EN;
+    i2c_smbus_write_byte(bus, data);
     usleep(1);
-
-    buffer[0] = data & ~LCD_ENABLE;
-    write(fd, buffer, 1);
-    usleep(50);
+    data &= ~LCD_EN;
+    i2c_smbus_write_byte(bus, data);
+    usleep(40);
 }
 
-static void lcd0801_write_byte(int fd, uint8_t address, uint8_t byte, uint8_t mode) {
-    lcd0801_write_nibble(fd, address, byte & 0xF0, mode);
-    lcd0801_write_nibble(fd, address, (byte << 4) & 0xF0, mode);
+static void lcd0801WriteByte(int bus, uint8_t addr, uint8_t value, uint8_t rs)
+{
+    lcd0801WriteNibble(bus, addr, value >> 4, rs);
+    lcd0801WriteNibble(bus, addr, value & 0x0F, rs);
 }
 
-void init_lcd_0801(int fd, uint8_t address) {
-    ioctl(fd, I2C_SLAVE, address);
+static void lcd0801Command(int bus, uint8_t addr, uint8_t cmd)
+{
+    lcd0801WriteByte(bus, addr, cmd, 0);
+    if (cmd == 0x01 || cmd == 0x02) usleep(1600); // clear/home tarda más
+    else usleep(40);
+}
+
+static void lcd0801WriteChar(int bus, uint8_t addr, char c)
+{
+    lcd0801WriteByte(bus, addr, c, 1);
+}
+
+void init_lcd_0801(int bus, uint8_t addr)
+{
+    // Inicialización en modo 4 bits (HD44780-compatible)
     usleep(50000);
-
-    // Inicialización en 4 bits
-    lcd0801_write_nibble(fd, address, 0x30, LCD_COMMAND);
+    lcd0801WriteNibble(bus, addr, 0x03, 0);
     usleep(4500);
-    lcd0801_write_nibble(fd, address, 0x30, LCD_COMMAND);
-    usleep(4500);
-    lcd0801_write_nibble(fd, address, 0x30, LCD_COMMAND);
+    lcd0801WriteNibble(bus, addr, 0x03, 0);
     usleep(150);
-    lcd0801_write_nibble(fd, address, 0x20, LCD_COMMAND);
+    lcd0801WriteNibble(bus, addr, 0x03, 0);
     usleep(150);
+    lcd0801WriteNibble(bus, addr, 0x02, 0); // modo 4 bits
 
-    lcd0801_write_byte(fd, address, 0x28, LCD_COMMAND); // 4-bit, 1 line, 5x8 dots
-    lcd0801_write_byte(fd, address, 0x08, LCD_COMMAND); // Display OFF
-    lcd0801_write_byte(fd, address, 0x01, LCD_COMMAND); // Clear display
+    lcd0801Command(bus, addr, 0x28); // 4-bit, 1-line, 5x8 dots
+    lcd0801Command(bus, addr, 0x0C); // display on, cursor off
+    lcd0801Command(bus, addr, 0x06); // entry mode: cursor right
+    lcd0801Command(bus, addr, 0x01); // clear display
     usleep(2000);
-    lcd0801_write_byte(fd, address, 0x06, LCD_COMMAND); // Entry mode
-    lcd0801_write_byte(fd, address, 0x0C, LCD_COMMAND); // Display ON, cursor OFF
 }
 
-void lcd0801WriteString(int fd, uint8_t address, const char* text) {
-    ioctl(fd, I2C_SLAVE, address);
-    for (int i = 0; i < 8 && text[i]; ++i) {
-        lcd0801_write_byte(fd, address, text[i], LCD_DATA);
-    }
+void lcd0801WriteString(int bus, uint8_t addr, const char *str)
+{
+    lcd0801Command(bus, addr, 0x80); // posición inicial
+    for (int i = 0; i < 8 && str[i]; i++)
+        lcd0801WriteChar(bus, addr, str[i]);
 }
