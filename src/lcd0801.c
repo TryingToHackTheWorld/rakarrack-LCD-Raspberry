@@ -1,77 +1,90 @@
-// lcd0801.c - Versión adaptada desde prueba Python funcional
-#include "lcd0801.h"
+#include <iostream>
+#include <string>
 #include <unistd.h>
-#include <stdint.h>
-#include <string.h>
-#include <stdio.h>
+#include <fcntl.h>
 #include <linux/i2c-dev.h>
 #include <sys/ioctl.h>
+#include "lcd0801.h"
 
-// Definición de pines según PCF8574
-#define LCD_RS  0x01  // P0
-#define LCD_RW  0x02  // P1 (no se usa)
-#define LCD_EN  0x04  // P2
-#define LCD_BL  0x08  // P3
+// Pines del PCF8574
+const uint8_t PIN_RS = 0x01;
+const uint8_t PIN_RW = 0x02;
+const uint8_t PIN_EN = 0x04;
+const uint8_t PIN_BL = 0x08;
 
-#define LCD_D4  0x10  // P4
-#define LCD_D5  0x20  // P5
-#define LCD_D6  0x40  // P6
-#define LCD_D7  0x80  // P7
+static int file_i2c_0801 = -1;
 
-static void lcd0801WriteNibble(int bus, uint8_t addr, uint8_t nibble, uint8_t rs)
-{
-    uint8_t data = 0;
-    data |= (nibble & 0x0F) << 4;  // D4-D7
-    data |= rs ? LCD_RS : 0;
-    data |= LCD_BL; // mantener backlight encendido
-    data |= LCD_EN;
-    i2c_smbus_write_byte(bus, data);
-    usleep(1);
-    data &= ~LCD_EN;
-    i2c_smbus_write_byte(bus, data);
-    usleep(40);
+void i2c_write_byte(uint8_t data) {
+    if (write(file_i2c_0801, &data, 1) != 1) {
+        perror("Error al escribir en el bus I2C");
+        exit(1);
+    }
 }
 
-static void lcd0801WriteByte(int bus, uint8_t addr, uint8_t value, uint8_t rs)
-{
-    lcd0801WriteNibble(bus, addr, value >> 4, rs);
-    lcd0801WriteNibble(bus, addr, value & 0x0F, rs);
+void lcd_strobe(uint8_t data) {
+    i2c_write_byte(data | PIN_EN | PIN_BL);
+    usleep(500);
+    i2c_write_byte((data & ~PIN_EN) | PIN_BL);
+    usleep(100);
 }
 
-static void lcd0801Command(int bus, uint8_t addr, uint8_t cmd)
-{
-    lcd0801WriteByte(bus, addr, cmd, 0);
-    if (cmd == 0x01 || cmd == 0x02) usleep(1600); // clear/home tarda más
-    else usleep(40);
+void lcd_write4bits(uint8_t data) {
+    i2c_write_byte(data | PIN_BL);
+    lcd_strobe(data);
 }
 
-static void lcd0801WriteChar(int bus, uint8_t addr, char c)
-{
-    lcd0801WriteByte(bus, addr, c, 1);
+void lcd_send(uint8_t cmd, uint8_t mode = 0) {
+    uint8_t high = mode | (cmd & 0xF0);
+    uint8_t low = mode | ((cmd << 4) & 0xF0);
+    lcd_write4bits(high);
+    lcd_write4bits(low);
 }
 
-void init_lcd_0801(int bus, uint8_t addr)
-{
-    // Inicialización en modo 4 bits (HD44780-compatible)
-    usleep(50000);
-    lcd0801WriteNibble(bus, addr, 0x03, 0);
-    usleep(4500);
-    lcd0801WriteNibble(bus, addr, 0x03, 0);
-    usleep(150);
-    lcd0801WriteNibble(bus, addr, 0x03, 0);
-    usleep(150);
-    lcd0801WriteNibble(bus, addr, 0x02, 0); // modo 4 bits
+void init_lcd_0801(int i2c_fd, uint8_t address){
+	if (ioctl(i2c_fd, I2C_SLAVE, address) < 0) {
+        std::cout << "INIT FAIL\r\n";
+    }else{
+		file_i2c_0801 = i2c_fd;
+		
+		usleep(50000); // Esperar más de 40ms tras encender
+		lcd_write4bits(0x30);
+		usleep(5000);
+		lcd_write4bits(0x30);
+		usleep(1000);
+		lcd_write4bits(0x30);
+		usleep(1000);
+		lcd_write4bits(0x20);  // 4-bit mode
 
-    lcd0801Command(bus, addr, 0x28); // 4-bit, 1-line, 5x8 dots
-    lcd0801Command(bus, addr, 0x0C); // display on, cursor off
-    lcd0801Command(bus, addr, 0x06); // entry mode: cursor right
-    lcd0801Command(bus, addr, 0x01); // clear display
-    usleep(2000);
+		lcd_send(0x28); // Function set: 4-bit, 2 lines (aunque solo se muestre una), 5x8 dots
+		lcd_send(0x0C); // Display ON, cursor OFF
+		lcd_send(0x06); // Entry mode set
+		lcd_send(0x01); // Clear display
+		usleep(2000);
+	}
 }
 
-void lcd0801WriteString(int bus, uint8_t addr, const char *str)
-{
-    lcd0801Command(bus, addr, 0x80); // posición inicial
-    for (int i = 0; i < 8 && str[i]; i++)
-        lcd0801WriteChar(bus, addr, str[i]);
+void lcd0801WriteString(char *text){
+	for (int i = 0; i < 8; ++i) {
+        char c = text[i];
+        if (c == '\0') break;
+        lcd_send(c, PIN_RS);
+    }
+}
+
+void lcd0801WriteString(int i2c_fd, uint8_t address, char* text){
+	if (ioctl(i2c_fd, I2C_SLAVE, address) < 0) {
+        std::cout << "INIT FAIL\r\n";
+    }else{
+		file_i2c_1601 = i2c_fd;
+		
+		// Borrado linea 1
+		lcd_send(0x80);
+		lcd_send(0x00);  // Set cursor to 0x00
+		lcd0801WriteString("        ");
+		
+		// Línea 1 - posición 0x00
+		lcd_send(0x80);
+		lcd_send(0x00);  // Set cursor to 0x00
+		lcd0801WriteString(text);
+	}
 }
