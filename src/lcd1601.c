@@ -50,20 +50,6 @@
 static int iBackLight = BACKLIGHT;
 static int file_i2c = -1;
 
-void lcd0801WriteString(int i2c_fd, uint8_t address, char* text){
-	if (ioctl(i2c_fd, I2C_SLAVE, address) < 0) {
-        std::cout << "INIT FAIL\r\n";
-    }else{
-		file_i2c = i2c_fd;
-		
-		WriteCommand(0x80 + 0x00);  // Set cursor to 0x00
-		lcdWriteString("        ");  // 8 espacios
-		
-		WriteCommand(0x80 + 0x00);  // Set cursor to 0x00
-		lcdWriteString(text);
-	}
-}
-
 void lcd1601WriteString(int i2c_fd, uint8_t address, char* text){
 	char buf[9] = {0};
 	if (ioctl(i2c_fd, I2C_SLAVE, address) < 0) {
@@ -91,7 +77,7 @@ void lcd1601WriteString(int i2c_fd, uint8_t address, char* text){
 	}
 }
 
-void init_lcd(int i2c_fd, uint8_t address){
+void init_lcd_1601(int i2c_fd, uint8_t address){
 	if (ioctl(i2c_fd, I2C_SLAVE, address) < 0) {
         std::cout << "INIT FAIL\r\n";
     }else{
