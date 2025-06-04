@@ -4,10 +4,11 @@
 #include <linux/i2c.h>
 #include <sys/ioctl.h>
 #include "lcd1601.c"
+#include "lcd0801.c"
 #include "led0401.c"
 #include "led0201.c"
 
-uint8_t address[10] = {0x27, 0x28, 0x29, 0x30, 0x31, 0x32, 0x32, 0x33, 0x34, 0x35};
+uint8_t address[10] = {0x27, 0x26, 0x25, 0x24, 0x23, 0x22, 0x21, 0x20, 0x19, 0x18};
 int last = -1;
 
 void
@@ -53,9 +54,9 @@ IOControl::IOControl(){
 	bus2 = open_i2c_device(charBus2);
 	led_0201_init("/dev/spidev0.0", 22); //PIN 22 = GPIO 25
 	init_ht16k33(bus1, 0x70);
-	init_lcd(bus1, 0x27);
+	init_lcd_1601(bus1, 0x27);
 	for(int cont=0; cont<10; cont++){
-		init_lcd(bus2, address[cont]);
+		init_lcd_0801(bus2, address[cont]);
 	}
 };
 
