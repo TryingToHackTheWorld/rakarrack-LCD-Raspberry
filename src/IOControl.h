@@ -21,6 +21,7 @@ private:
 	void sendTo8LCD(int bus, uint8_t address, char* text);
 	void sendTo2LED(int bus, uint8_t address, int number);
 	void sendTo4LED(int bus, uint8_t address, char* text);
+	void sendToWS2812B(int address, int status);
 	const char *charBus1;
 	const char *charBus2;
 	int bus1;
