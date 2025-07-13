@@ -53,7 +53,7 @@ static int file_i2c_1601 = -1;
 void lcd1601WriteString(int i2c_fd, uint8_t address, char* text){
 	char buf[9] = {0};
 	if (ioctl(i2c_fd, I2C_SLAVE, address) < 0) {
-        std::cout << "INIT FAIL\r\n";
+        //std::cout << "INIT FAIL\r\n";
     }else{
 		file_i2c_1601 = i2c_fd;
 		
@@ -79,7 +79,7 @@ void lcd1601WriteString(int i2c_fd, uint8_t address, char* text){
 
 void init_lcd_1601(int i2c_fd, uint8_t address){
 	if (ioctl(i2c_fd, I2C_SLAVE, address) < 0) {
-        std::cout << "INIT FAIL\r\n";
+        //std::cout << "INIT FAIL\r\n";
     }else{
 		file_i2c_1601 = i2c_fd;
 		
