@@ -13,7 +13,6 @@ public:
 	void setLooperName(int status);
 private:
 	int num[11]; //0-9=pedal status; 10=FX status; 11=Preset number
-	uint8_t address[10]; //Direcciones de los pedales en el bus2
 	char lcdPedal[9]; //Pedal LCD
 	char lcdPreset[17]; //Preset LCD
 	char lcdLooper[5]; //Looper LCD
