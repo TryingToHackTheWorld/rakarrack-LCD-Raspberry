@@ -211,6 +211,8 @@ else
 
 fi
 
+LIBS="$LIBS -lpigpio"
+
 if test "x$prefix" = "xNONE"; then
 AC_DEFINE_UNQUOTED(PREFIX, "/usr/local", [Install prefix])
 else
