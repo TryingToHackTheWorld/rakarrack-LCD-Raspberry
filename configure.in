@@ -211,8 +211,6 @@ else
 
 fi
 
-LIBS="$LIBS -lpigpiod_if2 -lws2811"
-
 if test "x$prefix" = "xNONE"; then
 AC_DEFINE_UNQUOTED(PREFIX, "/usr/local", [Install prefix])
 else
